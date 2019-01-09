@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+		#gameboard {
+			position:relative;
+			border:2px;
+		}
+		</style>
+
+		<script>
+			$(document).ready(function() {
+				var board = $ ("#gameboard"),ball = $("#ball"),sx = 6, sy = 8
+
+				var timer = setInterval (function () {
+
+						//var curx = ball.css("left")
+						var curx = ball.offset().left - board.offset().left;
+						var cury = ball.offset().top - board.offset().top;
+
+
+						ball.css({"left": curx+sx,"top": cury+sy});
+
+				},60);	
+			});
+		</script>
+	</head>
+</html>

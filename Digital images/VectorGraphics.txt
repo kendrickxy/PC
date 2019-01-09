@@ -1,0 +1,30 @@
+# VECTOR GRAPHICS
+
+- resolution independant (no pixels)
+- rectangles, ellipses, , curves, fills, patterns
+
+## Good for:
+
+- logos, 2d illustrations, 
+
+## Vector graphics files
+
+- .ps (postscript) language for printing
+- .esp (ecapsulated postscript) Adobe
+- .ai (adobe illustrator) native illustrator file
+- .svg (scalable vector graphics) open source, human readable XML, can be open by web browser and can be animated using js.
+
+## Creating vector graphics
+
+## Generic vector illustration software
+
+- Adobe illustrator (.ai)	
+- Inkscape, Open source software (.svg)
+- Affinity Design (New and for 1300czk)
+
+## How do you work with vector illustrations
+
+- shapes (rectangles, ovals, stars)
+- fonts (can be used as font, or convected into graphics)
+- fills (flat colors and gradients)
+- bezier curve

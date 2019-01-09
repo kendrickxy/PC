@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML5 CANVAS</title>
+		<style>
+		body{text-align:center}
+		#wrap{
+			width:900px;
+			margin-left:auto;
+			margin-right:auto;
+		}
+		#scene {border:1px solid black;}
+		</style>
+
+		<script src="jquery.js"></script>
+
+
+		</script>
+		<script>
+			var canvas, ctx, width, height, img;
+
+			$ (document).ready(function() {
+
+				canvas = document.getElementById("scene");
+				ctx = canvas.getContext("2d");
+				width = canvas.width;
+				height = canvas.height;
+
+				ctx.beginPath();
+				ctx.lineWidth = 6;
+				ctx.strokeStyle = "red";
+				ctx.fillStyle = "blue";
+				ctx.rect(100,100,200,300);
+				ctx.fill();
+				ctx.stroke();
+				ctx.closePath();
+
+				ctx.beginPath();
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = "Black";
+				ctx.fillStyle = "Yellow";
+				ctx.arc(300,300,50,0,Math.PI*2,true);
+				ctx.fill();
+				ctx.stroke();
+				ctx.closePath();
+
+				ctx.beginPath();
+				ctx.lineWidth = 5;
+				ctx.strokeStyle = "Green";
+				ctx.fillStyle = "#555";
+				ctx.moveTo(500,100);
+				ctx.lineTo(510,300);
+				ctx.lineTo(400,300);
+				ctx.lineTo(500,100);
+				ctx.fill();
+				ctx.stroke();
+				ctx.closePath();
+
+				img = new Image();
+				img.src = "RTX_2080Ti.jpg";
+
+				img.onload = function() {
+					console.log(img)
+					ctx.drawImage(img,0,0,950,500,20,20,950,500);
+				}
+
+
+
+
+
+
+			});
+
+
+		</script>	
+	</head>
+	<body>
+		<div id="wrap">
+			<h1>HTML5 CANVAS</h1>
+			<canvas id="scene" width="900" height="500"></canvas>
+		</div>
+	</body>
+</html>

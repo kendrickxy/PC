@@ -1,0 +1,1 @@
+ctx.drawImage (source, xywh direction, xywh on canvas)

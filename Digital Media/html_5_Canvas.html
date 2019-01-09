@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML5 CANVAS</title>
+		<style>
+		body{text-align:center}
+		#status {
+			position:fixed;
+			/*left:50px;
+			right:50px;
+			top:75px;
+			font-size:50px;*/
+			align-content:; 
+
+		}
+
+
+		#scene {border:1px solid black;}
+		</style>
+
+		<script src="objects/js/jquery.js"></script>
+
+
+		</script>
+		<script>
+			var canvas,
+			ctx,
+			width,
+			height,
+			isdrawing = false,
+			c = "black",
+			lw = 3;
+
+			$ (document).ready(function() {
+
+				canvas = document.getElementById("scene");
+				ctx = canvas.getContext ("2d");
+				width = canvas.width;
+				height = canvas.height;
+
+			;
+
+
+				$ (document).mousedown (function(evt) {
+
+					isdrawing = true;
+
+					var pos = getMousePos(evt);
+
+					$("#status").html("X: " + evt.pageX + " Y: " + evt.pageY);
+
+					ctx.beginPath();
+					ctx.lineWidth = lw;
+					ctx.strokeStyle = c;
+					ctx.moveTo(pos.x,pos.y);
+
+					});
+
+				$ (document).mousemove (function(evt) {
+
+					if(isdrawing){
+						var pos = getMousePos(evt);
+						ctx.lineTo(pos.x,pos.y);
+						ctx.stroke();
+					}
+
+				});
+
+				$(document).mouseup (function(evt) {
+
+					ctx.closePath();
+					isdrawing = false;
+
+
+				});
+
+				$("#c").change (function() {
+				
+					c = $(this).val();
+
+				});
+
+				$("#lw").change (function() {
+
+					lw = $(this).val();
+
+				});
+
+				$("#clear").click (function() {
+
+					ctx.clearRect(0,0,width,height);
+
+				});
+
+
+				function getMousePos(evt) {
+
+					var x = evt.pageX - $(canvas).offset().left;
+					var y = evt.pageY - $(canvas).offset().top;
+
+						return {"x":x,"y":y}
+
+				}
+
+			})	
+
+
+		</script>	
+	</head>
+	<body>
+	<p id="status">xx</p>
+		<div id="wrap">
+			<h1>HTML5 CANVAS</h1>
+			
+			<canvas id="scene" width="900" height="500"></canvas>
+
+			<select id="c">
+				<option value="black" selected>Black</option>
+				<option value="green">Green</option>
+				<option value="blue">Blue</option>
+				<option value="yellow">Yellow</option>
+				<option value="red">Red</option>
+			</select>
+			<input type="range" id="lw" min="1" max="20" value="2">
+			<input type="button" value="Clear canvas" id="clear">
+
+		</div>
+	</body>
+</html>

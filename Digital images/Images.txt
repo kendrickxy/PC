@@ -1,0 +1,35 @@
+// bitmap image
+
+
+## Bit depth
+
+- 8 bits	 (256 colors per channels) everything
+
+- 16 bits	 (65536 colors per channels) for retouching
+
+- 32 bits	 (16 milli colors per channels) 
+
+
+## Size
+
+px horizontaly 
+px verticaly
+
+1200 x 800 px
+
+resolution (DPI) 
+**digital images do not have resolution**
+
+
+## Files formats - Bitmap
+
+.psd 	- is native photoshop format (work in progress)
+.jpg 	- this format can be compressed
+.tiff 	- for print CMYK
+.png	- Portable Network Graphics
+.gif	- Older network format
+.raw	- not standardised format
+
+
+##Resizing and cropping
+

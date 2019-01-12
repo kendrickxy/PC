@@ -113,7 +113,7 @@ function Layer (img){
 	this.update = function(img){
 
 		if(this.y+this.h < 0) this.y = 0;
-		else this.y -= s+5;
+		else this.y -= img+5;
 
 	
 

@@ -16,8 +16,10 @@ var bcgdata  = [["images/Hall1.png","images/Hall2.png","images/Hall3.png"],
 				["images/Hall10.png","images/Hall20.png","images/Hall30.png"],
 				["images/Hall100.png","images/Hall200.png","images/Hall300.png"]];
 var curbcg = 0;
-var lrs = [];
-var CanSwitch = false
+var bcgid = 0;
+var lrs;
+var CanSwitch = false;
+var nxtpic = true;
 
 
 function Layer (id){
@@ -37,13 +39,14 @@ function Layer (id){
 
 		else {
 			this.x -= s+10;
+			nxtpic = true
 
 		} 
 
 		if (this.id = 3){
 			this.id = 0
 		}
-		console.log(this.id)
+		//console.log(this.id)
 
 	};
 
@@ -51,7 +54,6 @@ function Layer (id){
 
 		var img  = Store.cache[bcgdata[curbcg][this.id]];
 
-		//ctx.drawImage(img,0,0,this.w, this.h, this.x, this.y, this.w, this.h);
 		ctx.drawImage(img,0,0,this.w, this.h, this.x+this.w, this.y, this.w, this.h);
 	
 	};
@@ -64,10 +66,18 @@ function Layer (id){
 	};
 	function game(){
 		clear()
-		for(var i = 0; i < lrs.length; i++){
-			lrs[i].update(i);
-			lrs[i].render();
+		//for(var i = 0; i < lrs.length; i++){
+			//bcgid = 0
+			console.log(bcgdata[curbcg].length + " lengthbcgdata")
+			console.log(bcgid + " current image")
+			console.log(nxtpic + " next pic")
+			for(bcgid = bcgid; bcgid < bcgdata[0].length; bcgid++){	
+				//if( nxtpic == true)
+				lrs.update(bcgid);
+				lrs.render();
+				nxtpic = false
 		};
+			//bcgid = 0
 
 	};
 
@@ -80,7 +90,7 @@ function Layer (id){
 		else curbcg = 0;
 		CanSwitch = false;
 		
-		console.log(curbcg)
+		//console.log(curbcg)
 		
 
 
@@ -96,8 +106,8 @@ function Layer (id){
 	function Loadbcg(i) {
 		var img = 0
 		img.src = bcgdata[curbcg][i];
-		lrs.push(new Layer(i));
-		console.log(i)
+		//lrs.push(new Layer(i));
+		//console.log(i)
 
 	}
 
@@ -109,19 +119,13 @@ $(document).ready(function(){
     	ctx = canvas.getContext('2d');
 		width = window.innerWidth;
 		height = window.innerHeight;
-		console.log(Store.cache);
+		//console.log(Store.cache);
+		lrs = new Layer(0)
 
-	//	for (var i = 0; i < bcgdata[curbcg].length; i++){
-	//	var img = 0
-	//	img.src = bcgdata[curbcg][i];
-	//	lrs.push(new Layer(i));
-	//	console.log(i)
-	//	}
-		setInterval(Layer, 5000);
-
-		setInterval(game, 40);
+		//setInterval(Layer, 5000);
+		setInterval(game, 100);
 	});
 
 });
 
-$(document).ready(Loadbcg(0));
+//$(document).ready(Loadbcg(0));

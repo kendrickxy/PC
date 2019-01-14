@@ -2,7 +2,6 @@
 var canvas, ctx, width, height, img;
 var spritemap;
 var data = [
-	{"url": "images/Hall1.png"},
 	{"url": "images/Hall2.png"},
 	{"url": "images/Hall3.png"},
 	{"url": "images/Hall10.png"},
@@ -10,54 +9,37 @@ var data = [
 	{"url": "images/Hall30.png"},
 	{"url": "images/Hall100.png"},
 	{"url": "images/Hall200.png"},
-	{"url": "images/Hall300.png"}
+	{"url": "images/Wall1.png"},
+	{"url": "images/Floor1.png"},
 ]; 
-var bcgdata  = [["images/Hall1.png","images/Hall2.png","images/Hall3.png"],
-				["images/Hall10.png","images/Hall20.png","images/Hall30.png"],
-				["images/Hall100.png","images/Hall200.png","images/Hall300.png"]];
+var bcgdata  = ["images/Hall2.png","images/Hall3.png","images/Hall10.png","images/Hall20.png","images/Hall30.png","images/Hall100.png","images/Hall200.png","images/Wall1.png","images/Floor1.png"];
 var curbcg = 0;
 var bcgid = 0;
-var lrs;
+var lrs = [];
 var CanSwitch = false;
-var nxtpic = true;
+var nxtpic = false;
 
 
 function Layer (id){
 	this.id = id;
 	this.x = 0;
 	this.y = 0;
-	this.w = 1000;
-	this.h = 800;
+	this.w = 800;
+	this.h = 2000;
 	this.update = function(s){
 		
-		if(this.x + this.w < 0){
-			this.id = this.id + 1;
-			this.x -= s+10;
-			Loadbcg(this.id);
+		if(this.x + this.h < 1450) this.x = 0;
+		else this.x -= s+1;
+		console.log(this.x + this.h)
+		
+	}
+	this.render = function(){
+		
+		ctx.drawImage(this.id,0,0,this.w, this.h, this.x, this.y, this.w, this.h);
+		ctx.drawImage(this.id,0,0,this.w, this.h, this.x + this.w, this.y, this.w, this.h);
 
-		}
-
-		else {
-			this.x -= s+10;
-			nxtpic = true
-
-		} 
-
-		if (this.id = 3){
-			this.id = 0
-		}
-		//console.log(this.id)
-
-	};
-
-	this.render = function() {
-
-		var img  = Store.cache[bcgdata[curbcg][this.id]];
-
-		ctx.drawImage(img,0,0,this.w, this.h, this.x+this.w, this.y, this.w, this.h);
-	
-	};
-};
+	}
+}
 
 // Functions
 
@@ -66,18 +48,10 @@ function Layer (id){
 	};
 	function game(){
 		clear()
-		//for(var i = 0; i < lrs.length; i++){
-			//bcgid = 0
-			console.log(bcgdata[curbcg].length + " lengthbcgdata")
-			console.log(bcgid + " current image")
-			console.log(nxtpic + " next pic")
-			for(bcgid = bcgid; bcgid < bcgdata[0].length; bcgid++){	
-				//if( nxtpic == true)
-				lrs.update(bcgid);
-				lrs.render();
-				nxtpic = false
-		};
-			//bcgid = 0
+		for(var i = 0; i < lrs.length; i++){
+			lrs[i].update(i);
+			lrs[i].render();
+		}
 
 	};
 
@@ -106,12 +80,10 @@ function Layer (id){
 	function Loadbcg(i) {
 		var img = 0
 		img.src = bcgdata[curbcg][i];
-		//lrs.push(new Layer(i));
-		//console.log(i)
+		lrs.push(new Layer(i));
+		console.log(i)
 
 	}
-
-
 
 $(document).ready(function(){
 	Store.loaddata(data).then(function(){
@@ -119,13 +91,14 @@ $(document).ready(function(){
     	ctx = canvas.getContext('2d');
 		width = window.innerWidth;
 		height = window.innerHeight;
-		//console.log(Store.cache);
-		lrs = new Layer(0)
+	for(var i = 0; i < bcgdata.length; i++){
+		var img = new Image();
+		img.src = bcgdata[i];
+		lrs.push(new Layer(img));	
+	}
 
-		//setInterval(Layer, 5000);
-		setInterval(game, 100);
+		setInterval(game, 50);
 	});
 
 });
 
-//$(document).ready(Loadbcg(0));

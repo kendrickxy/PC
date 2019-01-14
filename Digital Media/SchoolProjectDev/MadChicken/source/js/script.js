@@ -2,22 +2,16 @@
 var canvas, ctx, width, height, img;
 var spritemap;
 var data = [
-	{"url": "images/Hall2.png"},
-	{"url": "images/Hall3.png"},
-	{"url": "images/Hall10.png"},
-	{"url": "images/Hall20.png"},
-	{"url": "images/Hall30.png"},
-	{"url": "images/Hall100.png"},
-	{"url": "images/Hall200.png"},
 	{"url": "images/Wall1.png"},
 	{"url": "images/Floor1.png"},
+	{"url": "images/AlphaR.png"},
 ]; 
-var bcgdata  = ["images/Hall2.png","images/Hall3.png","images/Hall10.png","images/Hall20.png","images/Hall30.png","images/Hall100.png","images/Hall200.png","images/Wall1.png","images/Floor1.png"];
+var bcgdata  = ["images/Wall1.png","images/Floor1.png"];
 var curbcg = 0;
 var bcgid = 0;
 var lrs = [];
-var CanSwitch = false;
-var nxtpic = false;
+var Alpha;
+var Score = 0;
 
 
 function Layer (id){
@@ -28,9 +22,15 @@ function Layer (id){
 	this.h = 2000;
 	this.update = function(s){
 		
-		if(this.x + this.h < 1450) this.x = 0;
-		else this.x -= s+1;
-		console.log(this.x + this.h)
+		if(this.x + this.h < 1450) {
+			this.x = 0;
+			Score += s+2;
+		}
+		else {
+			this.x -= s+2;
+			Score += s+2;
+		}
+		console.log(Score)
 		
 	}
 	this.render = function(){
@@ -40,6 +40,31 @@ function Layer (id){
 
 	}
 }
+
+
+function Rooster (x,y,szx,szy,jmp,){
+	this.x = x
+	this.y = y;
+	this.szx = szx;
+	this.szy = szy;
+	this.die = false;
+	this.update = function() {
+
+			// animations and jumping system will be updated HERE
+
+	}
+
+	this.render = function() {
+		ctx.drawImage(spritemap,this.x,this.y); //img,x,y,szx,szy
+
+	}
+
+};
+
+
+
+
+
 
 // Functions
 
@@ -52,24 +77,14 @@ function Layer (id){
 			lrs[i].update(i);
 			lrs[i].render();
 		}
+		ctx.font = "30px Arial";
+		ctx.fillText(Scoring(Score), 10, 50);
+		Alpha.update();
+		Alpha.render();
 
 	};
-
-	function WorldChange(){
-
-		if (curbcg < 2 && CanSwitch == true) {
-		
-		curbcg = curbcg + 1;
-		}
-		else curbcg = 0;
-		CanSwitch = false;
-		
-		//console.log(curbcg)
 		
 
-
-
-	};
 	function RandomTime(){
 		var ran = Math.random();
 		if (ran > 0.5)
@@ -77,13 +92,11 @@ function Layer (id){
 
 	}
 
-	function Loadbcg(i) {
-		var img = 0
-		img.src = bcgdata[curbcg][i];
-		lrs.push(new Layer(i));
-		console.log(i)
-
+	function Scoring(S) {
+		return (Math.round(S/100))
 	}
+
+
 
 $(document).ready(function(){
 	Store.loaddata(data).then(function(){
@@ -91,6 +104,10 @@ $(document).ready(function(){
     	ctx = canvas.getContext('2d');
 		width = window.innerWidth;
 		height = window.innerHeight;
+		spritemap = new Image();
+		spritemap.src= "images/AlphaR.png";
+		
+		Alpha = new Rooster( 50,496, 64); //img,x,y,szx,szy
 	for(var i = 0; i < bcgdata.length; i++){
 		var img = new Image();
 		img.src = bcgdata[i];

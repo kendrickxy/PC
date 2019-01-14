@@ -48,7 +48,7 @@ function Ship(x,y,sz,sp,r,pch,m){
 	}
 	this.render = function(){
 	
-			drawImage(spritemap, this.r * this.sz, this.pch * this.sz, 
+		ctx.drawImage(spritemap, this.r * this.sz, this.pch * this.sz, 
 		this.sz, this.sz, this.x, this.y, this.sz, this.sz);
 		
 	}
@@ -142,8 +142,6 @@ $(document).ready(function(){
 				luke.r = 1;
 				luke.m[luke.r] = true;
 			break;
-			case 32:
-				bullet.push(new Bullet);
 		}
 		
 	});
@@ -169,7 +167,7 @@ $(document).ready(function(){
 			enemies.push(new Ship(Math.random()*width,-100,64,20,1,1,[false,true, false, false]));	//x,y,sz,sp,r,pch,m
 		}
 			console.log(enemies);
-	},2000);
+	},1000);
 	
 	setInterval(game, 60);
 

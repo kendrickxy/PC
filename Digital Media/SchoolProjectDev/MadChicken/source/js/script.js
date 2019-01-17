@@ -7,6 +7,8 @@ var data = [
 	{"url": "images/AlphaR.png"},
 	{"url": "images/smScientist.png"},
 	{"url": "images/smBomb.png"},
+	{"url": "images/smHens.png"},
+
 ]; 
 var bcgdata  = ["images/Wall1.png","images/Floor1.png"];
 var curbcg = 0;
@@ -15,6 +17,7 @@ var lrs = [];
 var Alpha;
 var RScientist = [];
 var Bombs = [];
+var SavHens = [];
 var Score = 0;
 var up = 0;
 var HFloor = 800-48; //Floors height
@@ -36,7 +39,7 @@ function Layer (id){
 			this.x -= s+2;
 			Score += s+2;
 		}
-		//console.log(Score)
+		console.log(Score)
 		
 	}
 	this.render = function(){
@@ -83,7 +86,7 @@ function Rooster (x,y,jmp){
 			}
 
 		if(this.y < 150){
-			console.log(this.y)
+			//console.log(this.y)
 			up = 3;
 			this.y += up;
 			if(this.jmp == true){
@@ -115,10 +118,27 @@ function Scientist(x,y){
 	this.die = false;
 	this.update = function() {
 		this.x -= 20
+		// WHEN HIT U GET 5 PTS
+		// FINISH COLLISION SYSTEM
+		// FINISH ADD POINTS SYSTEM
+
+		var Collide = Collision (this.x,this.y,smScientist.width,smScientist.height) //bx,by,bWidth,bHeight
+		//console.log(Collide)
+
+		if(Collide == true && this.die == false){
+			Score += 100
+			this.die = true
+		}
+
+		if(this.x < 0){
+			this.die = true
+		}
 	}
 	this.render = function() {
 		ctx.drawImage(smScientist,this.x,this.y);
 	}
+
+};
 
 function Bomb(x,y){
 	this.x = x;
@@ -126,13 +146,55 @@ function Bomb(x,y){
 	this.die = false;
 	this.update = function() {
 		this.x -= 50
+		// WHEN HITS YOU, YOU DIE
+		// FINISH COLLISION SYSTEM
+		// FINISH DEATH WHEN HITTING
+
+		var Collide = Collision (this.x,this.y,smBomb.width,smBomb.height) //bx,by,bWidth,bHeight
+		//console.log(Collide)
+
+		if(Collide == true){
+			alert("GAME OVER");
+		}
+		if(this.x < 0){
+			this.die = true
+		}
+
 	};
 	this.render = function() {
 		ctx.drawImage(smBomb,this.x,this.y);
 	};
 };
 
+function Hens(x,y) {
+	this.x = x;
+	this.y = y;
+	this.free = false;
+	this.update = function () {
+		this.x -= 45
+		// WHEN HIT, U GET 15 PTS
+		// FINISH COLLISION SYSTEM
+		// FINISH ADD POINTS SYSTEM
+
+		var Collide = Collision (this.x,this.y,smHens.width,smHens.height) //bx,by,bWidth,bHeight
+		//console.log(Collide)
+
+		if(Collide == true && this.die == false){
+			Score += 300
+			this.die = true
+		}
+
+
+		if(this.x < 0){
+			this.die = true
+		}
+	};
+
+	this.render = function() {
+		ctx.drawImage(smHens,this.x,this.y);
+	};
 };
+
 
 
 // Functions
@@ -153,14 +215,31 @@ function Bomb(x,y){
 		for(var e = 0; e < RScientist.length; e++){
 			RScientist[e].update();
 			RScientist[e].render();
+			if(RScientist[e].die){
+				RScientist.splice(e,1);
+				e--;
+		}
 		}
 
 		for(var d = 0; d < Bombs.length; d++){
 			Bombs[d].update();
 			Bombs[d].render();
+			if(Bombs[d].die){
+				Bombs.splice(d,1);
+				d--;
+		}	
+	}
+
+				for(var d = 0; d < SavHens.length; d++){
+			SavHens[d].update();
+			SavHens[d].render();
+			if(SavHens[d].die){
+				SavHens.splice(d,1);
+				d--;
+		}
 		}	
 		
-		console.log(Alpha.y)
+		//console.log(Alpha.y)
 
 	};
 
@@ -173,8 +252,31 @@ function Bomb(x,y){
 	}
 
 	function Scoring(S) {
-		return (Math.round(S/100))
+		return (Math.round(S/10))
 	}
+
+	function Collision (bx,by,bWidth,bHeight){
+
+		this.Px = Alpha.x  //Player's location x
+		this.Py = Alpha.y 	//Player's location y
+		this.bx = bx
+		this.by = by 	//Brick
+		this.bW = bWidth	//Brick's width
+		this.bH = bHeight 	//Brick's height
+		this.PH = smAlpha.height
+		this.PW = smAlpha.width
+
+		if (this.Px < this.bx + this.bW &&
+   			this.Px + this.PW > this.bx &&
+   			this.Py < this.by + this.bH &&
+   			this.PH + this.Py > this.by){ // &&
+
+			return (true)
+	} else {
+			return (false)
+		};
+
+		};
 
 
 
@@ -190,8 +292,10 @@ $(document).ready(function(){
 		smScientist.src ="images/smScientist.png";
 		smBomb = new Image();
 		smBomb.src = "images/smBomb.png";
+		smHens = new Image();
+		smHens.src = "images/smHens.png";
 		
-		Alpha = new Rooster(50,HFloor-256,false);	//x,y,szx,szy,jmp
+		Alpha = new Rooster(50,HFloor-smAlpha.height,false);	//x,y,szx,szy,jmp
 
 	for(var i = 0; i < bcgdata.length; i++){
 		var img = new Image();
@@ -230,17 +334,27 @@ $(document).ready(function(){
 		setInterval(function(){
 		var ran = Math.random();
 		if (ran > 0.6){
-			RScientist.push(new Scientist(1450,HFloor-128));	//x,y
-			console.log("loading")
+			RScientist.push(new Scientist(1450,HFloor-smScientist.height));	//x,y
+			console.log("Scientists")
 		}
-	},1500);
+	},1700);
 
 		setInterval(function(){
 		var ran = Math.random();
 		if (ran > 0.6){
-			Bombs.push(new Bomb(1450,HFloor-128));	//x,y
+			Bombs.push(new Bomb(1450,HFloor-smBomb.height));	//x,y
 			console.log("BOMB!")
+
+
 		}
-	},1500);
+	},1600);
+
+		setInterval(function(){
+		var ran = Math.random();
+		if (ran > 0.6){
+			SavHens.push(new Hens(1450,HFloor-smHens.height));	//x,y
+			console.log("CHIKITA!")
+		}
+	},2200);
 
 });

@@ -7,11 +7,4 @@ body {
   position: relative;
 }
 
-.container {
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  position: relative;
-}
-
-#scene{border: 1px solid black;}
+#scene,#startmenu{border: 1px solid black;}

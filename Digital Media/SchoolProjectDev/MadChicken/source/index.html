@@ -3,6 +3,7 @@
 	<head>
 		<link href="css/style.css" type="text/css" rel="stylesheet" />
 		<script src="js/jquery-3.3.1.min.js"></script>
+		<script src="js/fpsmeter.js"></script>
 		<script src="js/loader.js"></script>
 		<script src="js/raf.js"></script>
 		<script src="js/ac.js"></script>
@@ -25,9 +26,49 @@
 	</head>
 	<body> 
 		<h1>MAD CHICKEN</h1> <!-- To replace with a logo  -->
-		<div id="wrap">
-			<canvas id="scene" width="1000" height="800"></canvas>
+		
+				<div id="startmenu">
+
+			<style>
+
+				.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+				.button:hover {
+					background: lightsalmon;
+				}
+
+			</style>
+
+			<button class="button">Button</button>
+
 		</div>
+
+		<div id="wrap">
+
+			<canvas id="scene" width="1000" height="800"
+				style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+ 			<canvas id="startmenu" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+  			<canvas id="optionmenu" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
+  			<canvas id="leaderboard" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 3;"></canvas>
+  			<canvas id="sound" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 4;"></canvas>
+		</div>
+
+
 		<style>
 
 	</body>

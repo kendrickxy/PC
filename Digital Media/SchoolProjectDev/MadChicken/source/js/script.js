@@ -8,6 +8,7 @@ var data = [
 	{"url": "images/smScientist.png"},
 	{"url": "images/smBomb.png"},
 	{"url": "images/smHens.png"},
+	{"url": "images/Jump.wav"},
 
 ]; 
 var bcgdata  = ["images/Wall1.png","images/Floor1.png"];
@@ -20,7 +21,14 @@ var Bombs = [];
 var SavHens = [];
 var Score = 0;
 var up = 0;
+var fps = 60;
 var HFloor = 800-48; //Floors height
+	var now;
+	var last = timestamp();
+	dt = 0;
+	var fpsmeter = new FPSMeter(canvas, { decimals: 0, graph: true, theme: 'dark', left: '5px' });
+	var step = 1/fps;
+
 
 
 function Layer (id){
@@ -117,7 +125,7 @@ function Scientist(x,y){
 	this.y = y;
 	this.die = false;
 	this.update = function() {
-		this.x -= 20
+		this.x -= 10
 		// WHEN HIT U GET 5 PTS
 		// FINISH COLLISION SYSTEM
 		// FINISH ADD POINTS SYSTEM
@@ -127,6 +135,7 @@ function Scientist(x,y){
 
 		if(Collide == true && this.die == false){
 			Score += 100
+			alert("HIT SCIENCE");
 			this.die = true
 		}
 
@@ -145,7 +154,7 @@ function Bomb(x,y){
 	this.y = y;
 	this.die = false;
 	this.update = function() {
-		this.x -= 50
+		this.x -= 25
 		// WHEN HITS YOU, YOU DIE
 		// FINISH COLLISION SYSTEM
 		// FINISH DEATH WHEN HITTING
@@ -155,6 +164,7 @@ function Bomb(x,y){
 
 		if(Collide == true){
 			alert("GAME OVER");
+			this.die = true;
 		}
 		if(this.x < 0){
 			this.die = true
@@ -171,16 +181,17 @@ function Hens(x,y) {
 	this.y = y;
 	this.free = false;
 	this.update = function () {
-		this.x -= 45
+		this.x -= 22
 		// WHEN HIT, U GET 15 PTS
 		// FINISH COLLISION SYSTEM
 		// FINISH ADD POINTS SYSTEM
 
 		var Collide = Collision (this.x,this.y,smHens.width,smHens.height) //bx,by,bWidth,bHeight
-		//console.log(Collide)
+		console.log(Collide)
 
 		if(Collide == true && this.die == false){
 			Score += 300
+			alert("HIT HENS");
 			this.die = true
 		}
 
@@ -199,49 +210,107 @@ function Hens(x,y) {
 
 // Functions
 
-	function clear(){
-		ctx.clearRect(0,0,width,height);
-	};
-	function game(){
-		clear()
-		for(var i = 0; i < lrs.length; i++){
-			lrs[i].update(i);
-			lrs[i].render();
-		}
-		ctx.font = "30px Arial";
-		ctx.fillText(Scoring(Score), 10, 50);
-		Alpha.update();
-		Alpha.render();
-		for(var e = 0; e < RScientist.length; e++){
-			RScientist[e].update();
-			RScientist[e].render();
-			if(RScientist[e].die){
-				RScientist.splice(e,1);
-				e--;
-		}
+function timestamp() {
+  return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+};
+
+
+function render() {
+
+	for(var i = 0; i < lrs.length; i++){
+		lrs[i].render();
+	}
+	Alpha.render();
+	for(var e = 0; e < RScientist.length; e++){
+		RScientist[e].render();
+	}
+
+	for(var d = 0; d < Bombs.length; d++){
+		Bombs[d].render();	
+	}
+
+		for(var d = 0; d < SavHens.length; d++){
+			SavHens[d].render();
 		}
 
-		for(var d = 0; d < Bombs.length; d++){
-			Bombs[d].update();
-			Bombs[d].render();
-			if(Bombs[d].die){
-				Bombs.splice(d,1);
-				d--;
+}
+
+function update() {
+
+	for(var i = 0; i < lrs.length; i++){
+		lrs[i].update(i);
+	}
+	Alpha.update();
+	for(var e = 0; e < RScientist.length; e++){
+		RScientist[e].update();
+	}
+
+	for(var d = 0; d < Bombs.length; d++){
+		Bombs[d].update();	
+	}
+
+		for(var d = 0; d < SavHens.length; d++){
+			SavHens[d].update();
+		}
+
+}
+
+
+
+function game(){
+
+	fpsmeter.tickStart();
+
+	now = timestamp();
+	dt = dt + Math.min(1, (now - last) / 1000);  // duration in seconds
+	while(dt > step) {
+    	dt = dt - step;
+   		update(step);
+   		render(dt);
+  	}
+	last = now;
+
+//	for(var i = 0; i < lrs.length; i++){
+//		lrs[i].update(i);
+//		lrs[i].render();
+//	}
+	ctx.font = "30px Arial";
+	ctx.fillText(Scoring(Score), 10, 50);
+//	Alpha.update();
+//	Alpha.render();
+	for(var e = 0; e < RScientist.length; e++){
+//		RScientist[e].update();
+//		RScientist[e].render();
+		if(RScientist[e].die){
+			RScientist.splice(e,1);
+			e--;
+	}
+	}
+
+	for(var d = 0; d < Bombs.length; d++){
+//		Bombs[d].update();
+//		Bombs[d].render();
+		if(Bombs[d].die){
+			Bombs.splice(d,1);
+			d--;
 		}	
 	}
 
-				for(var d = 0; d < SavHens.length; d++){
-			SavHens[d].update();
-			SavHens[d].render();
-			if(SavHens[d].die){
-				SavHens.splice(d,1);
-				d--;
+		for(var d = 0; d < SavHens.length; d++){
+//			SavHens[d].update();
+//			SavHens[d].render();
+		if(SavHens[d].die){
+			SavHens.splice(d,1);
+			d--;
 		}
 		}	
+				fpsmeter.tick();
 		
 		//console.log(Alpha.y)
+		requestAnimationFrame(game); // request the next frame
 
-	};
+
+};
 
 
 	function RandomTime(){
@@ -281,6 +350,26 @@ function Hens(x,y) {
 
 
 $(document).ready(function(){
+
+	function scaleToWindow (){
+    var gamearea = document.getElementById('wrap');
+    var ratio = 100/80;
+    var newWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var newHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var newratio = newWidth / newHeight;
+    if(newratio > ratio){
+        newWidth = newHeight * ratio;
+        gamearea.style.height = newHeight+"px";
+        gamearea.style.width = newWidth+"px";
+    }else{
+        newHeight  = newWidth / ratio;
+        gamearea.style.height = newHeight+"px";
+        gamearea.style.width = newWidth+"px";
+    }
+    gamearea.style.marginTop = (-newHeight/2)+"px";
+    gamearea.style.marginLeft = (-newWidth/2)+"px";
+}
+
 	Store.loaddata(data).then(function(){
     	canvas = document.getElementById('scene');
     	ctx = canvas.getContext('2d');
@@ -294,6 +383,7 @@ $(document).ready(function(){
 		smBomb.src = "images/smBomb.png";
 		smHens = new Image();
 		smHens.src = "images/smHens.png";
+		ScaleWindow = new scaleToWindow();
 		
 		Alpha = new Rooster(50,HFloor-smAlpha.height,false);	//x,y,szx,szy,jmp
 
@@ -303,6 +393,18 @@ $(document).ready(function(){
 		lrs.push(new Layer(img));	
 	}
 
+
+	document.addEventListener('touchstart', function( evt ) {
+
+		Alpha.jmp = true;
+
+	});
+	document.addEventListener('touchstart', function( evt ) {
+
+				Alpha.jmp = false;
+				Alpha.gld = false;
+
+	});
 	$(document).keydown(function( evt ){
 		
 		switch( evt.keyCode){
@@ -328,7 +430,11 @@ $(document).ready(function(){
 		}	
 	});
 
-		setInterval(game, 50);
+		game();
+
+		requestAnimationFrame(game); // start the first frame
+
+		//setInterval(game, 50);
 	});
 
 		setInterval(function(){

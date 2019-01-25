@@ -1,0 +1,4 @@
+
+body { font-family:Georgia, "Times New Roman", Times, serif}
+#game-wrapper { margin:0 auto; width: 500px;text-align:center }
+#scene {border:1px solid #000;position:relative;}

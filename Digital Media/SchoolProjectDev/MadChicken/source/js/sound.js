@@ -1,6 +1,6 @@
 function Sound (dataitem, loadHandler){
 	this.source = dataitem.url;
-	this.ac =  new AudioContext();
+	this.ac = new AudioContext();
 	this.volumeNode = this.ac.createGain();
     this.panNode = this.ac.createStereoPanner();
     this.convolverNode = this.ac.createConvolver();
@@ -41,7 +41,7 @@ function Sound (dataitem, loadHandler){
 					 loadHandler();
             	});
         };
-		request.onerror = function() { alert("error")};   
+//		request.onerror = function() { alert("error")};   
         request.send();	
 	}
 	

@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Keyboard Input</title>
+<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'></script>
+<script type="text/javascript">
+ $(document).ready(function(){
+							
+	$("#txtInput").keydown(function(event){ // keyboard alerts						
+								
+			var arrKeys = "";
+	
+			if (event.ctrlKey) {
+				arrKeys = "Ctrl";
+			}else if (event.altKey) {
+				arrKeys = "Alt";
+			}else if (event.shiftKey) {
+				arrKeys = "Shift";
+			}
+	$("#txt1").append("KEY NO: "+event.keyCode+" EVENT TYPE: "+event.type +" WITH:"+arrKeys+"<br />");		
+			
+		 });					
+		
+		
+	$("#clearme").click(function(event){
+			
+			$("#txtInput").val("");
+			$("#txt1").html("");
+			
+		 });
+					
+	});						
+</script>
+</head>
+<body>
+    <h1>Keyboard Input</h1>
+        <P>Type some characters into the first textbox.</p>
+        <P><textarea id="txtInput" rows="3" cols="25"></textarea></p>
+        	<div id="txt1"></div>
+        	<input type="submit" id="clearme"  value="clear it"/>
+</body>
+</html>

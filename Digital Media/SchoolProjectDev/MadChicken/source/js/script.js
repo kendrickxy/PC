@@ -1,15 +1,19 @@
 //Global Variables
 var canvas, ctx, width, height, img;
-var smAlpha, smScientist, smBomb;
+var smAlpha, smScientist, smBomb, TWall, TFloor;
 var data = [
-	{"url": "images/Wall1.png"},
-	{"url": "images/Floor1.png"},
-	{"url": "images/AlphaR.png"},
-	{"url": "images/smScientist.png"},
-	{"url": "images/smBomb.png"},
-	{"url": "images/smHens.png"},
-	{"url": "images/Jump.wav"},
-
+	{"url":"images/Wall1.png"},
+	{"url":"images/Floor1.png"},
+	{"url":"images/AlphaR.png"},
+	{"url":"images/smScientist.png"},
+	{"url":"images/smBomb.png"},
+	{"url":"images/smHens.png"},
+	{"url":"sound/Jump.wav"},	
+	{"url":"sound/Scream1.wav"},
+	{"url":"sound/Scream2.wav"},
+	{"url":"sound/Scream3.wav"},
+	{"url":"sound/Tap.wav"},
+	{"url":"sound/Bomb.wav"},
 ]; 
 var bcgdata  = ["images/Wall1.png","images/Floor1.png"];
 var curbcg = 0;
@@ -21,15 +25,20 @@ var Bombs = [];
 var SavHens = [];
 var Score = 0;
 var up = 0;
-var fps = 60;
+var fps = 120;
+var NextFrame = true;
 var HFloor = 800-48; //Floors height
 	var now;
-	var last = timestamp();
+	var last = timestamp(),
 	dt = 0;
-	var fpsmeter = new FPSMeter(canvas, { decimals: 0, graph: true, theme: 'dark', left: '5px' });
 	var step = 1/fps;
-
-
+var AnimFram;
+var Spawn;
+var falsy = false;
+var deadchicken = false;
+var SpawningScience, SpawningBomb, SpawningHens;
+var PlaySFX, PlayMusic;
+var CanJump = true;
 
 function Layer (id){
 	this.id = id;
@@ -69,14 +78,19 @@ function Rooster (x,y,jmp){
 	this.update = function() {
 
 			// animations and jumping system will be updated HERE
-		if(this.jmp == true && this.gld == false && this.fall == false){
+		if(this.jmp == true && this.gld == false && this.fall == false){		//Jumping
 			up = -50;
 			this.y += up;
+
+					do{
+						PlayJump(Store.cache["sound/Jump.wav"])
+			}
+		while(falsy == true)
 			
 			//console.log(this.y)
 		}
 
-		else if(this.y < 495 && this.gld == false){
+		else if(this.y < 495 && this.gld == false){				//Check if he's at max height
 				up = 30;
 				this.y += up;
 				this.jmp = false;
@@ -92,6 +106,7 @@ function Rooster (x,y,jmp){
 				this.fall = false;
 				
 			}
+
 
 		if(this.y < 150){
 			//console.log(this.y)
@@ -113,7 +128,7 @@ function Rooster (x,y,jmp){
 	};	
 	
 	this.render = function() {
-		ctx.drawImage(smAlpha,this.x,this.y); //
+		ctx.drawImage(Store.cache["images/AlphaR.png"],this.x,this.y); //
 
 	}
 
@@ -131,16 +146,15 @@ function Scientist(x,y){
 		// FINISH ADD POINTS SYSTEM
 
 		var Collide = Collision (this.x,this.y,smScientist.width,smScientist.height) //bx,by,bWidth,bHeight
-		//console.log(Collide)
 
 		if(Collide == true && this.die == false){
-			Score += 100
-			alert("HIT SCIENCE");
-			this.die = true
+			Score += 100;
+		scream();
+			this.die = true;
 		}
 
 		if(this.x < 0){
-			this.die = true
+			this.die = true;
 		}
 	}
 	this.render = function() {
@@ -163,8 +177,9 @@ function Bomb(x,y){
 		//console.log(Collide)
 
 		if(Collide == true){
-			alert("GAME OVER");
+			Playsound(Store.cache["sound/Bomb.wav"]);
 			this.die = true;
+			deadchicken = true;
 		}
 		if(this.x < 0){
 			this.die = true
@@ -183,11 +198,10 @@ function Hens(x,y) {
 	this.update = function () {
 		this.x -= 22
 		// WHEN HIT, U GET 15 PTS
-		// FINISH COLLISION SYSTEM
+		// FIX COLLISION SYSTEM
 		// FINISH ADD POINTS SYSTEM
 
 		var Collide = Collision (this.x,this.y,smHens.width,smHens.height) //bx,by,bWidth,bHeight
-		console.log(Collide)
 
 		if(Collide == true && this.die == false){
 			Score += 300
@@ -210,77 +224,188 @@ function Hens(x,y) {
 
 // Functions
 
+function Initialize() {
+	fplaySFX();
+	//fplayMusic();
+}
+
+
+function scaleToWindow (){
+    var gamearea = document.getElementById('wrap');
+    var ratio = 100/80;
+    var newWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var newHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var newratio = newWidth / newHeight;
+    console.log(window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
+    console.log(window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
+
+    if(newratio > ratio){
+        newWidth = newHeight * ratio;
+        gamearea.style.height = newHeight+"px";
+        gamearea.style.width = newWidth+"px";
+    }else{
+        newHeight  = newWidth / ratio;
+        gamearea.style.height = newHeight+"px";
+        gamearea.style.width = newWidth+"px";
+    }
+    gamearea.style.marginTop = (-newHeight/2)+"px";
+    gamearea.style.marginLeft = (-newWidth/2)+"px";
+}
+
+function StartGame() {
+		document.getElementById('StartScreen').style.display = 'none';
+		document.getElementById('EndScreen').style.display = 'none';
+		requestAnimationFrame(game);
+
+		SpawningScience = setInterval(SpawnScientists,1700);
+
+		SpawningBomb = setInterval(SpawnBombs,1600);
+		
+		SpawningHens = setInterval(SpawnHens,2200);
+};
+
+function OptionGame() {
+	document.getElementById('OptionScreen').style.display = 'block';
+}
+
+function ReturnGame() {
+	document.getElementById('OptionScreen').style.display = 'none';
+}
+
+function EndGame() {
+		document.getElementById('EndScreen').style.display = 'block';
+		document.getElementById("ScoreEnd").innerHTML = "Your score is: " + Scoring(Score);
+		clearInterval(SpawningScience);
+		clearInterval(SpawningHens);
+		clearInterval(SpawningBomb);
+		cancelAnimationFrame(AnimFram);
+}
+
+function QuitGame(){
+
+		window.location.assign("https://www.google.com")
+		cancelAnimationFrame(AnimFram);
+}
+
+function fplayMusic(){
+
+  if (document.getElementById("cbmusic").checked == true){
+    PlayMusic = true;
+  }
+  else {
+    PlayMusic = false;
+  }
+};
+
+function fplaySFX(){
+
+  if (document.getElementById("cbsfx").checked == true){
+    PlaySFX = true;
+  }
+  else {
+    PlaySFX = false;
+  }
+};
+
+
+function PlayJump(Jump){
+	this.Jump = Jump;
+
+	if(PlaySFX == true && CanJump == true) {
+		this.Jump.play();
+		CanJump = false;
+		console.log(PlaySFX);
+	}
+	else{
+		setTimeout(function(){
+			CanJump = true;
+		},100);
+		console.log(PlaySFX);
+
+	}
+
+}
+
+
+function Playsound(sound){
+	this.sound = sound
+
+	if(PlaySFX == true) {
+		this.sound.play();
+		console.log(PlaySFX);
+	}
+	else{
+		console.log(PlaySFX);
+
+	}
+
+}
+
+function Playmusic(music) {
+		this.music = music
+
+	if(PlayMusic == true) {
+		this.music.play();
+		console.log(PlayMusic);
+	}
+	else{
+		console.log(PlayMusic);
+	}
+
+};
+
+
+function Restart(){
+		location.reload();
+}
+
 function timestamp() {
   return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
 };
 
 
-function render() {
-
-	for(var i = 0; i < lrs.length; i++){
-		lrs[i].render();
+function SpawnScientists(){
+	var ran = Math.random();
+	if (ran > 0.6){
+		RScientist.push(new Scientist(1450,HFloor-smScientist.height));
+		console.log("Scientists")
 	}
-	Alpha.render();
-	for(var e = 0; e < RScientist.length; e++){
-		RScientist[e].render();
-	}
+};	
 
-	for(var d = 0; d < Bombs.length; d++){
-		Bombs[d].render();	
-	}
+function SpawnBombs(){
+	var ran = Math.random();
+	if (ran > 0.6){
+		Bombs.push(new Bomb(1450,HFloor-smBomb.height));
+		console.log("BOMB!")
 
-		for(var d = 0; d < SavHens.length; d++){
-			SavHens[d].render();
-		}
+	}
+};
+
+function SpawnHens(){
+	var ran = Math.random();
+	if (ran > 0.6){
+		SavHens.push(new Hens(1450,HFloor-smHens.height));
+		console.log("CHIKITA!")
+	}
+};
+
+function render(){
 
 }
 
 function update() {
 
-	for(var i = 0; i < lrs.length; i++){
+			for(var i = 0; i < lrs.length; i++){
 		lrs[i].update(i);
+		lrs[i].render();
 	}
+	ctx.font = "30px Arial, solid white";
+	ctx.fillText(Scoring(Score), 10, 50);
 	Alpha.update();
+	Alpha.render();
 	for(var e = 0; e < RScientist.length; e++){
 		RScientist[e].update();
-	}
-
-	for(var d = 0; d < Bombs.length; d++){
-		Bombs[d].update();	
-	}
-
-		for(var d = 0; d < SavHens.length; d++){
-			SavHens[d].update();
-		}
-
-}
-
-
-
-function game(){
-
-	fpsmeter.tickStart();
-
-	now = timestamp();
-	dt = dt + Math.min(1, (now - last) / 1000);  // duration in seconds
-	while(dt > step) {
-    	dt = dt - step;
-   		update(step);
-   		render(dt);
-  	}
-	last = now;
-
-//	for(var i = 0; i < lrs.length; i++){
-//		lrs[i].update(i);
-//		lrs[i].render();
-//	}
-	ctx.font = "30px Arial";
-	ctx.fillText(Scoring(Score), 10, 50);
-//	Alpha.update();
-//	Alpha.render();
-	for(var e = 0; e < RScientist.length; e++){
-//		RScientist[e].update();
-//		RScientist[e].render();
+		RScientist[e].render();
 		if(RScientist[e].die){
 			RScientist.splice(e,1);
 			e--;
@@ -288,8 +413,8 @@ function game(){
 	}
 
 	for(var d = 0; d < Bombs.length; d++){
-//		Bombs[d].update();
-//		Bombs[d].render();
+		Bombs[d].update();
+		Bombs[d].render();
 		if(Bombs[d].die){
 			Bombs.splice(d,1);
 			d--;
@@ -297,28 +422,39 @@ function game(){
 	}
 
 		for(var d = 0; d < SavHens.length; d++){
-//			SavHens[d].update();
-//			SavHens[d].render();
+			SavHens[d].update();
+			SavHens[d].render();
 		if(SavHens[d].die){
 			SavHens.splice(d,1);
 			d--;
 		}
 		}	
-				fpsmeter.tick();
-		
-		//console.log(Alpha.y)
-		requestAnimationFrame(game); // request the next frame
+			Spawn = false
+			//scaleToWindow();
 
+}
+
+
+function game(){
+	now = timestamp();
+	dt = (now - last) / 1000;  // duration in seconds
+	Spawn = true
+ 	dt = dt - step;
+	update(step);
+	render(dt);
+	last = now;
+//	ScaleWindow()
+
+		if(deadchicken === true) {
+			EndGame();
+		}
+		else{
+			AnimFram = requestAnimationFrame(game); // request the next frame
+
+		}
+			
 
 };
-
-
-	function RandomTime(){
-		var ran = Math.random();
-		if (ran > 0.5)
-		var Time = ran * 10000
-
-	}
 
 	function Scoring(S) {
 		return (Math.round(S/10))
@@ -332,8 +468,8 @@ function game(){
 		this.by = by 	//Brick
 		this.bW = bWidth	//Brick's width
 		this.bH = bHeight 	//Brick's height
-		this.PH = smAlpha.height
-		this.PW = smAlpha.width
+		this.PH = Store.cache["images/AlphaR.png"].height
+		this.PW = Store.cache["images/AlphaR.png"].width
 
 		if (this.Px < this.bx + this.bW &&
    			this.Px + this.PW > this.bx &&
@@ -348,50 +484,64 @@ function game(){
 		};
 
 
+	function scream() {
+		var ran = Math.random();
+		var Screaming
+		if (ran < 0.25) {
+
+			Playsound(Store.cache["sound/Scream1.wav"]);
+
+		}
+
+		else if (ran >= 0.25 && ran < 0.5) {
+			Playsound(Store.cache["sound/Scream2.wav"]);
+
+		}
+
+		else if (ran >= 0.5 && ran <= 1) {
+			Playsound(Store.cache["sound/Scream3.wav"]);
+
+		}
+	};
+
+$(function() {
+   $('.button').hover( function(){
+	Playsound(Store.cache["sound/Tap.wav"]);
+
+   },
+   function(){
+   });
+});
 
 $(document).ready(function(){
 
-	function scaleToWindow (){
-    var gamearea = document.getElementById('wrap');
-    var ratio = 100/80;
-    var newWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var newHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    var newratio = newWidth / newHeight;
-    if(newratio > ratio){
-        newWidth = newHeight * ratio;
-        gamearea.style.height = newHeight+"px";
-        gamearea.style.width = newWidth+"px";
-    }else{
-        newHeight  = newWidth / ratio;
-        gamearea.style.height = newHeight+"px";
-        gamearea.style.width = newWidth+"px";
-    }
-    gamearea.style.marginTop = (-newHeight/2)+"px";
-    gamearea.style.marginLeft = (-newWidth/2)+"px";
-}
+	document.getElementById('startbtn').innerHTML = "START GAME"
 
-	Store.loaddata(data).then(function(){
+	Initialize();
+
+Store.loaddata(data).then(function(){
+
     	canvas = document.getElementById('scene');
     	ctx = canvas.getContext('2d');
-		width = window.innerWidth;
-		height = window.innerHeight;
-		smAlpha = new Image();
-		smAlpha.src= "images/AlphaR.png";
-		smScientist = new Image();
-		smScientist.src ="images/smScientist.png";
-		smBomb = new Image();
-		smBomb.src = "images/smBomb.png";
-		smHens = new Image();
-		smHens.src = "images/smHens.png";
-		ScaleWindow = new scaleToWindow();
-		
+    	smAlpha = Store.cache["images/AlphaR.png"];
+		smScientist = Store.cache["images/smScientist.png"];
+		smBomb = Store.cache["images/smBomb.png"];
+		smHens = Store.cache["images/smHens.png"];
+		TFloor = Store.cache["images/Floor1.png"];
+		TWall = Store.cache["images/Wall1.png"];
+		//canvas.width = 1000;
+		//canvas.height = 800;
+		//console.log(canvas.width)
+	//	height = newHeight;
+//Store.cache["images/AlphaR.png"];
+//Store.cache["sound/Jump.wav"].play();
 		Alpha = new Rooster(50,HFloor-smAlpha.height,false);	//x,y,szx,szy,jmp
-
+});
 	for(var i = 0; i < bcgdata.length; i++){
 		var img = new Image();
 		img.src = bcgdata[i];
 		lrs.push(new Layer(img));	
-	}
+	};
 
 
 	document.addEventListener('touchstart', function( evt ) {
@@ -399,7 +549,7 @@ $(document).ready(function(){
 		Alpha.jmp = true;
 
 	});
-	document.addEventListener('touchstart', function( evt ) {
+	document.addEventListener('touchend', function( evt ) {
 
 				Alpha.jmp = false;
 				Alpha.gld = false;
@@ -412,7 +562,7 @@ $(document).ready(function(){
 				Alpha.jmp = true;
 			break;
 			case 38:
-				Alpha.jmp = true;
+				Alpha.jmp = true;		
 			break;
 		}
 		
@@ -421,46 +571,12 @@ $(document).ready(function(){
 		switch( evt.keyCode){
 			case 32:
 				Alpha.jmp = false;
-				Alpha.gld = false
+				Alpha.gld = false;
 			break;
 			case 38:
 				Alpha.jmp = false;
-				Alpha.gld = false
+				Alpha.gld = false;
 			break;
-		}	
+		};
 	});
-
-		game();
-
-		requestAnimationFrame(game); // start the first frame
-
-		//setInterval(game, 50);
-	});
-
-		setInterval(function(){
-		var ran = Math.random();
-		if (ran > 0.6){
-			RScientist.push(new Scientist(1450,HFloor-smScientist.height));	//x,y
-			console.log("Scientists")
-		}
-	},1700);
-
-		setInterval(function(){
-		var ran = Math.random();
-		if (ran > 0.6){
-			Bombs.push(new Bomb(1450,HFloor-smBomb.height));	//x,y
-			console.log("BOMB!")
-
-
-		}
-	},1600);
-
-		setInterval(function(){
-		var ran = Math.random();
-		if (ran > 0.6){
-			SavHens.push(new Hens(1450,HFloor-smHens.height));	//x,y
-			console.log("CHIKITA!")
-		}
-	},2200);
-
 });

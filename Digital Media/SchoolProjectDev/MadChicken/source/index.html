@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html>
 	<head>
+
+				<h1>MAD CHICKEN</h1> <!-- To replace with a logo  --> 
+
+	 <!--	
+			<canvas id="startmenu" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+  			<canvas id="optionmenu" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
+  			<canvas id="leaderboard" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 3;"></canvas>
+  			<canvas id="sound" width="1000" height="800" 
+  				style="position: absolute; left: 0; top: 0; z-index: 4;"></canvas> -->
+
+	</head>
+	<body> 
+
 		<link href="css/style.css" type="text/css" rel="stylesheet" />
 		<script src="js/jquery-3.3.1.min.js"></script>
-		<script src="js/fpsmeter.js"></script>
+		<script src="js/sound.js"></script>
 		<script src="js/loader.js"></script>
 		<script src="js/raf.js"></script>
 		<script src="js/ac.js"></script>
 		<script src="js/engine.js"></script>
-		<script src="js/game.js"></script>
-		<script src="js/screen.js"></script>
 		<script src="js/script.js"></script>
     	<script src="PlayFabSdk/src/PlayFab/PlayFabAdminApi.js"></script>
     	<script src="PlayFabSdk/src/PlayFab/PlayFabClientApi.js"></script>
@@ -23,53 +37,51 @@
     	<script src="PlayFabSdk/src/PlayFab/PlayFabLocalizationApi.js"></script>
     	<script src="PlayFabSdk/src/PlayFab/PlayFabMultiplayerApi.js"></script>
     	<script src="PlayFabSdk/src/PlayFab/PlayFabProfilesApi.js"></script>
-	</head>
-	<body> 
-		<h1>MAD CHICKEN</h1> <!-- To replace with a logo  -->
-		
-				<div id="startmenu">
 
-			<style>
 
-				.button {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-}
+								<div id="wrap">
 
-				.button:hover {
-					background: lightsalmon;
-				}
-
-			</style>
-
-			<button class="button">Button</button>
-
+	<canvas id="scene" width=1000px height=800px>		
+	</canvas>
+		<div id="EndScreen">
+			<h1>FRIED CHICKEN</h1>
+		<div id="EndNav">
+			<h2 id="ScoreEnd">Score? Nope</h2>
+			<div class="button" onclick="Restart()">MAIN MENU</div>
 		</div>
+	</div>
 
-		<div id="wrap">
-
-			<canvas id="scene" width="1000" height="800"
-				style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
- 			<canvas id="startmenu" width="1000" height="800" 
-  				style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
-  			<canvas id="optionmenu" width="1000" height="800" 
-  				style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
-  			<canvas id="leaderboard" width="1000" height="800" 
-  				style="position: absolute; left: 0; top: 0; z-index: 3;"></canvas>
-  			<canvas id="sound" width="1000" height="800" 
-  				style="position: absolute; left: 0; top: 0; z-index: 4;"></canvas>
+	<div id="StartScreen">
+		<h1>START MENU</h1>
+		<div id="StartNav">
+			<div id="startbtn" class="button" onclick="StartGame()">LOADING...</div>
+			<div id="optionbtn" class="button" onclick="OptionGame()">OPTION</div>
+			<div id="quitbtn" class="button" onclick="QuitGame()">QUIT GAME</div>
 		</div>
+	</div>
 
+		<div id="Thanks" style="display: none;">
+			<p>THANKS FOR PLAYING!</p>
+		</div>
+	
+	</div> 
 
-		<style>
+	<div id="OptionScreen">
+		<h1>OPTION MENU</h1>
+	<div id="OptionNav">
+		<div class="txt">MUSIC</div>
+		<label class="switch">
+  <input type="checkbox" id="cbmusic" onclick="fplayMusic()" checked>
+  <span class="slider round"></span>
+</label>
+		<div class="txt">SFX</div>
+		<label class="switch">
+  <input type="checkbox" id="cbsfx" onclick="fplaySFX()" checked>
+  <span class="slider round"></span>
+</label>
+		<div class="button" onclick="ReturnGame()">RETURN</div>
+	</div>
+	</div>
 
 	</body>
 </html> 

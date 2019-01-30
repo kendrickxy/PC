@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Special meta tag allows you to pass Google Client ID. Replace the content attribute value with your own Client Id -->
+    <meta name="google-signin-client_id" content="883014121942-jrgp0ii54n943gbdcjo4smul5c44tm0k.apps.googleusercontent.com"><!-- // TODO: PUT YOUR GOOGLE CLIENT_ID HERE! -->
+    <!-- Load Google platform SDK-->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- Load PlayFab Client JavaScript SDK -->
+    <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
+</head>
+<body>
+    <p>Google Access Token Auth Example</p>
+    <!-- Neat Google button gets styled automatically when Google platform SDK is loaded -->
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <script>
+        // Invoked when user has signed in with Google
+        function onSignIn() {
+            // Retrieve access token
+            var accessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token;
+            
+            // Execute LoginWithGoogleAccount API call using the access token. Please replace TitleID with your own.
+            logLine("Attempting PlayFab Sign-in");
+            PlayFabClientSDK.LoginWithGoogleAccount({
+                AccessToken: accessToken,
+                CreateAccount : true,            
+                TitleId: "804F", // TODO: PUT YOUR TITLE ID HERE!
+            }, onPlayFabResponse);
+        }
+
+        // Handles response from playfab.
+        function onPlayFabResponse(response, error) {
+            if (response)
+                logLine("Response: " + JSON.stringify(response));
+            if (error)
+                logLine("Error: " + JSON.stringify(error));
+        }
+
+        function logLine(message) {
+            var textnode = document.createTextNode(message);
+            document.body.appendChild(textnode);
+            var br = document.createElement("br");
+            document.body.appendChild(br);
+        }
+    </script>
+</body>
+</html>

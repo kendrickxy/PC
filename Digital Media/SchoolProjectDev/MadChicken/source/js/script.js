@@ -14,6 +14,7 @@ var data = [
 	{"url":"sound/Scream3.wav"},
 	{"url":"sound/Tap.wav"},
 	{"url":"sound/Bomb.wav"},
+	{"url":"sound/CluckHen.wav"},
 ]; 
 var bcgdata  = ["images/Wall1.png","images/Floor1.png"];
 var curbcg = 0;
@@ -38,6 +39,7 @@ var falsy = false;
 var deadchicken = false;
 var SpawningScience, SpawningBomb, SpawningHens;
 var PlaySFX, PlayMusic;
+var LeavingGame = false;
 var CanJump = true;
 
 function Layer (id){
@@ -56,7 +58,7 @@ function Layer (id){
 			this.x -= s+2;
 			Score += s+2;
 		}
-		console.log(Score)
+	//	console.log(Score)
 		
 	}
 	this.render = function(){
@@ -81,11 +83,7 @@ function Rooster (x,y,jmp){
 		if(this.jmp == true && this.gld == false && this.fall == false){		//Jumping
 			up = -50;
 			this.y += up;
-
-					do{
-						PlayJump(Store.cache["sound/Jump.wav"])
-			}
-		while(falsy == true)
+			PlayJump(Store.cache["sound/Jump.wav"])
 			
 			//console.log(this.y)
 		}
@@ -139,6 +137,7 @@ function Scientist(x,y){
 	this.x = x;
 	this.y = y;
 	this.die = false;
+	this.prize = 100;
 	this.update = function() {
 		this.x -= 10
 		// WHEN HIT U GET 5 PTS
@@ -148,7 +147,7 @@ function Scientist(x,y){
 		var Collide = Collision (this.x,this.y,smScientist.width,smScientist.height) //bx,by,bWidth,bHeight
 
 		if(Collide == true && this.die == false){
-			Score += 100;
+			Score += this.prize;
 		scream();
 			this.die = true;
 		}
@@ -168,7 +167,7 @@ function Bomb(x,y){
 	this.y = y;
 	this.die = false;
 	this.update = function() {
-		this.x -= 25
+		this.x -= 20
 		// WHEN HITS YOU, YOU DIE
 		// FINISH COLLISION SYSTEM
 		// FINISH DEATH WHEN HITTING
@@ -182,7 +181,7 @@ function Bomb(x,y){
 			deadchicken = true;
 		}
 		if(this.x < 0){
-			this.die = true
+			this.die = true;
 		}
 
 	};
@@ -195,7 +194,9 @@ function Hens(x,y) {
 	this.x = x;
 	this.y = y;
 	this.free = false;
+	this.die = false;
 	this.update = function () {
+	this.prize = 350;
 		this.x -= 22
 		// WHEN HIT, U GET 15 PTS
 		// FIX COLLISION SYSTEM
@@ -204,10 +205,14 @@ function Hens(x,y) {
 		var Collide = Collision (this.x,this.y,smHens.width,smHens.height) //bx,by,bWidth,bHeight
 
 		if(Collide == true && this.die == false){
-			Score += 300
-			alert("HIT HENS");
-			this.die = true
+
+			Score += this.prize;
+			Playsound(Store.cache["sound/CluckHen.wav"]);
+			this.die = true;
 		}
+		else{
+			console.log("NO HIT");
+		};
 
 
 		if(this.x < 0){
@@ -283,9 +288,22 @@ function EndGame() {
 
 function QuitGame(){
 
+
+	if(LeavingGame == false){
+		document.getElementById('quitbtn').innerHTML = "COMFIRM";
+		LeavingGame = true;
+		setTimeout(function(){
+			document.getElementById('quitbtn').innerHTML = "QUIT GAME";
+			LeavingGame = false;
+		},2000);
+	}
+	else {
+		LeavingGame = false
+		document.getElementById('quitbtn').innerHTML = "LEAVING...";
 		window.location.assign("https://www.google.com")
 		cancelAnimationFrame(AnimFram);
-}
+	};
+};
 
 function fplayMusic(){
 
@@ -314,13 +332,13 @@ function PlayJump(Jump){
 	if(PlaySFX == true && CanJump == true) {
 		this.Jump.play();
 		CanJump = false;
-		console.log(PlaySFX);
+	//	console.log(PlaySFX);
 	}
 	else{
 		setTimeout(function(){
 			CanJump = true;
 		},100);
-		console.log(PlaySFX);
+	//	console.log(PlaySFX);
 
 	}
 
@@ -332,10 +350,10 @@ function Playsound(sound){
 
 	if(PlaySFX == true) {
 		this.sound.play();
-		console.log(PlaySFX);
+	//	console.log(PlaySFX);
 	}
 	else{
-		console.log(PlaySFX);
+	//	console.log(PlaySFX);
 
 	}
 
@@ -346,10 +364,10 @@ function Playmusic(music) {
 
 	if(PlayMusic == true) {
 		this.music.play();
-		console.log(PlayMusic);
+	//	console.log(PlayMusic);
 	}
 	else{
-		console.log(PlayMusic);
+	//	console.log(PlayMusic);
 	}
 
 };
@@ -399,8 +417,9 @@ function update() {
 		lrs[i].update(i);
 		lrs[i].render();
 	}
-	ctx.font = "30px Arial, solid white";
+	ctx.font = "30px Trebuchet MS";
 	ctx.fillText(Scoring(Score), 10, 50);
+	ctx.fillStyle = "white";
 	Alpha.update();
 	Alpha.render();
 	for(var e = 0; e < RScientist.length; e++){

@@ -15,6 +15,7 @@ var data = [
 	{"url":"sound/Tap.wav"},
 	{"url":"sound/Bomb.wav"},
 	{"url":"sound/CluckHen.wav"},
+	{"url":"sound/Points.wav"},
 ]; 
 var bcgdata  = ["images/Wall1.png","images/Floor1.png"];
 var curbcg = 0;
@@ -148,6 +149,7 @@ function Scientist(x,y){
 
 		if(Collide == true && this.die == false){
 			Score += this.prize;
+			Playsound(Store.cache["sound/Points.wav"]);
 		scream();
 			this.die = true;
 		}
@@ -208,6 +210,7 @@ function Hens(x,y) {
 
 			Score += this.prize;
 			Playsound(Store.cache["sound/CluckHen.wav"]);
+			Playsound(Store.cache["sound/Points.wav"]);
 			this.die = true;
 		}
 		else{
